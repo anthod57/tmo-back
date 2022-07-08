@@ -80,6 +80,8 @@ Router.delete("/", (req, res) => {
     User.findById(mongoose.Types.ObjectId(req.body.id)).then((result) => {
         result.remove();
         return res.status(200).send("OK");
+    }).catch((error) => {
+        return res.status(500).send(error);
     });
 });
 
