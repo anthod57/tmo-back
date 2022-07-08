@@ -5,14 +5,14 @@ export const POST_SCHEMA = {
 }
 
 export const GET_SCHEMA = {
-    id: { type: "number" }
+    id: { type: "string" }
 }
 
 export const DELETE_SCHEMA = {
-    id: { type: "number" }
+    id: { type: "string" }
 }
 
 export const PUT_SCHEMA = {
-    id: { type: "number" },
-    offer: { type: "object", props: POST_SCHEMA }
+    id: { type: "string" },
+    data: { type: "object", props: POST_SCHEMA }
 }
