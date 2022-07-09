@@ -8,17 +8,23 @@ const Router = express.Router();
 const User = mongoose.model("User");
 const v = new Validator();
 
-Router.post("/", (req, res) => {
+Router.post("/", async (req, res) => {
 
     // Throw an error if the request body is not matching with the required schema 
     if (v.validate(req.body, POST_SCHEMA) != true) {
         return res.status(500).send("Invalid request");
     }
 
+    // Check if email already exists in the database
+    if (await User.exists({ email: req.body.email })) {
+        return res.status(200).send("Email alredy exists");
+    }
+
+
     let user = new User(req.body);
 
     user.save().then((result) => {
-        return res.status(200).send(result);
+        return res.status(201).send(result);
     }).catch((error) => {
         return res.status(500).send(error);
     })
