@@ -2,7 +2,7 @@ import express from "express";
 import Validator from "fastest-validator";
 import mongoose from 'mongoose';
 import '../database/index.js';
-import { POST_SCHEMA, GET_SCHEMA, PUT_SCHEMA, DELETE_SCHEMA } from "./schemas.js";
+import { POST_SCHEMA } from "./schemas.js";
 
 const Router = express.Router();
 const User = mongoose.model("User");
@@ -30,14 +30,14 @@ Router.post("/", async (req, res) => {
     })
 });
 
-Router.get("/", (req, res) => {
-    // Throw an error if the request body is not matching with the required schema 
-    if (v.validate(req.body, GET_SCHEMA) != true) {
+Router.get("/:id", (req, res) => {
+    // Throw an error if id is not provided
+    if (!req.params.id) {
         return res.status(500).send("Invalid request");
     }
 
     // Find user by ID. We need to convert the ID String from the request to ObjectID Type
-    User.findById(mongoose.Types.ObjectId(req.body.id)).then((result) => {
+    User.findById(mongoose.Types.ObjectId(req.params.id)).then((result) => {
         if (!result) {
             return res.status(404).send("User not found");
         }
@@ -48,27 +48,27 @@ Router.get("/", (req, res) => {
     });
 });
 
-Router.put("/", (req, res) => {
-    // Throw an error if the request body is not matching with the required schema 
-    if (v.validate(req.body, PUT_SCHEMA) != true) {
+Router.put("/:id", (req, res) => {
+    // Throw an error if the request body is not matching with the required schema or if id is not provided
+    if (!req.params.id) {
         return res.status(500).send("Invalid request");
     }
 
-    if (v.validate(req.body.data, POST_SCHEMA) != true) {
+    if (v.validate(req.body, POST_SCHEMA) != true) {
         return res.status(500).send("Invalid request");
     }
 
     // Find user by ID. We need to convert the ID String from the request to ObjectID Type
-    User.findById(mongoose.Types.ObjectId(req.body.id)).then(async (result) => {
+    User.findById(mongoose.Types.ObjectId(req.params.id)).then(async (result) => {
         if (!result) {
             return res.status(404).send("User not found");
         }
 
         // Update the user with data from req.body.data
-        User.updateOne({ _id: result._id }, req.body.data).then((e) => {
+        User.updateOne({ _id: result._id }, req.body).then((e) => {
 
             // Find and return the updated user
-            User.findById(mongoose.Types.ObjectId(req.body.id)).then((result) => {
+            User.findById(mongoose.Types.ObjectId(req.params.id)).then((result) => {
                 return res.status(200).send(result);
             });
         });
@@ -77,13 +77,13 @@ Router.put("/", (req, res) => {
     });
 });
 
-Router.delete("/", (req, res) => {
-    // Throw an error if the request body is not matching with the required schema 
-    if (v.validate(req.body, DELETE_SCHEMA) != true) {
+Router.delete("/:id", (req, res) => {
+    // Throw an error if id is not provided
+    if (!req.params.id) {
         return res.status(500).send("Invalid request");
     }
 
-    User.findById(mongoose.Types.ObjectId(req.body.id)).then((result) => {
+    User.findById(mongoose.Types.ObjectId(req.params.id)).then((result) => {
         result.remove();
         return res.status(200).send("OK");
     }).catch((error) => {

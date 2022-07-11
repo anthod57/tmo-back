@@ -10,6 +10,6 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
-app.use("/api/", Router);
+app.use("/api", Router);
 
 app.listen(PORT, () => console.log(`[EXPRESS] Starting server on port: ${PORT}.`));
