@@ -30,6 +30,13 @@ Router.post("/", async (req, res) => {
     })
 });
 
+Router.get("/", (req, res) => {
+    User.find({}).then((result) => {
+        return res.status(200).send(result);
+    }).catch((error) => {
+        return res.status(500).send(error);
+    })
+});
 Router.get("/:id", (req, res) => {
     // Throw an error if id is not provided
     if (!req.params.id) {
