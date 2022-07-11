@@ -8,6 +8,11 @@ const Router = express.Router();
 const User = mongoose.model("User");
 const v = new Validator();
 
+// POST request to /api/
+// Schema.js -> POST_SCHEMA must be provided in request body
+// -- 200 if email already exists in database -- 
+// -- 201 if user is created -- 
+// -- 500 if any error occured -- 
 Router.post("/", async (req, res) => {
 
     // Throw an error if the request body is not matching with the required schema 
@@ -30,6 +35,8 @@ Router.post("/", async (req, res) => {
     })
 });
 
+// GET request to /api/
+// Return all users from database
 Router.get("/", (req, res) => {
     User.find({}).then((result) => {
         return res.status(200).send(result);
@@ -37,6 +44,12 @@ Router.get("/", (req, res) => {
         return res.status(500).send(error);
     })
 });
+
+// GET request to /api/ID
+// Return an user based on the provided ID (ex: /api/62c9a3acb886fe37acc8d8c1)
+// -- 200 if user found, returns the user data -- 
+// -- 404 if user not found -- 
+// -- 500 if any error occured -- 
 Router.get("/:id", (req, res) => {
     // Throw an error if id is not provided
     if (!req.params.id) {
@@ -55,6 +68,12 @@ Router.get("/:id", (req, res) => {
     });
 });
 
+// PUT request to /api/ID
+// Edit user from database based on the provided ID (ex: /api/62c9a3acb886fe37acc8d8c1)
+// Schema.js -> POST_SCHEMA must be provided in request body
+// -- 200 if changes have been applied, returns the user data -- 
+// -- 404 if user not found -- 
+// -- 500 if any error occured -- 
 Router.put("/:id", (req, res) => {
     // Throw an error if the request body is not matching with the required schema or if id is not provided
     if (!req.params.id) {
@@ -84,6 +103,11 @@ Router.put("/:id", (req, res) => {
     });
 });
 
+// DELETE request to /api/ID
+// Delte an user based on the provided ID (ex: /api/62c9a3acb886fe37acc8d8c1)
+// -- 200 if user is deleted -- 
+// -- 404 if user not found -- 
+// -- 500 if any error occured -- 
 Router.delete("/:id", (req, res) => {
     // Throw an error if id is not provided
     if (!req.params.id) {
@@ -91,6 +115,10 @@ Router.delete("/:id", (req, res) => {
     }
 
     User.findById(mongoose.Types.ObjectId(req.params.id)).then((result) => {
+        if (!result) {
+            return res.status(404).send("User not found");
+        }
+
         result.remove();
         return res.status(200).send("OK");
     }).catch((error) => {
